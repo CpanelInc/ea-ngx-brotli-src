@@ -1,43 +1,8 @@
-# INSERT TITLE HERE
+# ea-ngx-brotli-src
 
-## Target Audiences
+This is a “source-ball” package (ZC-7806) needed to compile brotli modules for  `ea-nginx` (enabled via `ea-nginx-brotli`).
 
-1. Maintenance and security teams
-2. Training and technical support
-3. Managers and other internal key stakeholders
-4. Future project/feature owners/maintainers
-
-## Detailed Summary
-
-…
-
-## Overall Intent
-
-…
-
-### Piece 1 Intent
-
-…
-
-### Piece 2 Intent
-
-…
-
-### Piece 3 Intent
-
-…
-
-## Maintainability
-
-Estimate:
-
-1. how much time and resources will be needed to maintain the feature in the future
-2. how frequently maintenance will need to happen
-
-## Options/Decisions
-
-…
-
-## Child Documents
-
-* [more test](./DESIGN/more.md)
+The other option was to bundle it in `ea-nginx-brotli` or `ea-nginx` but then:
+* users would have the source on their servers for no reason
+* it would mean `ea-nginx` would have multiple sources in one repo whish is impossible to keep up to date
+   * this is why we came up with the idea of source-ball packages in the first place
