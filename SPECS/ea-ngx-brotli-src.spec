@@ -30,8 +30,16 @@ Brotli is a generic-purpose lossless compression algorithm that compresses data 
 
 %install
 
-mkdir -p %{buildroot}/opt/cpanel/ea-ngx-brotli-src
-cp -rf ./* %{buildroot}/opt/cpanel/ea-ngx-brotli-src
+set -x
+
+if [ "$0" == "debian/override_dh_auto_install.sh" ]; then
+    mkdir -p ./opt/cpanel/ea-ngx-brotli-src
+    find . ! -name . -prune ! -name opt ! -name debian
+    find . ! -name . -prune ! -name opt ! -name debian -exec mv {} opt/cpanel/ea-ngx-brotli-src \;
+else
+    mkdir -p %{buildroot}/opt/cpanel/ea-ngx-brotli-src
+    cp -rf ./* %{buildroot}/opt/cpanel/ea-ngx-brotli-src
+fi
 
 %files
 /opt/cpanel/ea-ngx-brotli-src/

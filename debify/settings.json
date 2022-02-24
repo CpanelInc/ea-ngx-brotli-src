@@ -1,0 +1,3 @@
+{
+    "adjust_install_file_src": [ [ "^debian/tmp/(.*)", "$1" ] ]
+}
