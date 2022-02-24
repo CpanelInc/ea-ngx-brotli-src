@@ -29,10 +29,15 @@ sub _get_required {
     # get $version, $url, $name from $res
     my $version = Cpanel::JSON::Load( $res->{content} )->[0]{tag_name};
     $version =~ s/v//;
+
+    my $suffix = "";
+    if ( $version =~ s/rc$// ) {    # rc make things diffcult so lets drop it for this repo
+        $suffix = "rc";
+    }
     die "Could not determine version from github\n" if !$version;
 
-    my $name = "v$version.tar.gz";
-    my $url  = "https://github.com/google/ngx_brotli/archive/$name";
+    my $name = "$version.tar.gz";                                                       # needs to match $version
+    my $url  = "https://github.com/google/ngx_brotli/archive/v$version$suffix.tar.gz";
 
     return ( $version, $url, $name );
 }
