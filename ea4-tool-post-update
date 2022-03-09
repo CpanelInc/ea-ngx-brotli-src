@@ -1,0 +1,78 @@
+#!/usr/local/cpanel/3rdparty/bin/perl
+# cpanel - ea4-tool-post-update                 Copyright(c) 2022 cPanel, L.L.C.
+#                                                           All rights Reserved.
+# copyright@cpanel.net                                         http://cpanel.net
+# This code is subject to the cPanel license. Unauthorized copying is prohibited
+
+package ea_ngx_brotli_src::ea4_tool_post_update;
+
+use strict;
+use warnings;
+
+use lib "../ea-tools/lib/ea4_tool";    # assumes ea-tools is checked out next to this repo
+use ea4_tool::util ();
+use Cpanel::JSON   ();
+use File::chdir;
+use File::Temp ();
+
+exit( run(@ARGV) ? 0 : 1 ) if !caller;
+
+sub run {
+    my ( $old_ver, $new_ver ) = @_;
+
+    my ( $gittag, $tarball_path, $tarball_dir ) = _get_update_info();
+
+    my $gitdir = "$CWD";    # stringify object, no refs for the wicked
+    {
+        my $tmp = File::Temp->newdir;
+        local $CWD = "$tmp";    # stringify object, no refs for the wicked
+        _sys("git clone https://github.com/google/ngx_brotli.git $tarball_dir");
+        $CWD = $tarball_dir;
+        _sys("git -c advice.detachedHead=false checkout $gittag");
+        _sys("git submodule update --init");
+        $CWD = "..";
+        _sys("tar czf $gitdir/$tarball_path $tarball_dir");
+    }
+
+    print "Committing tarball change …\n";
+    my $git    = ea4_tool::util::git($CWD);
+    my $branch = $git->current_branch();
+
+    $git->run( add    => $tarball_path );
+    $git->run( commit => "-m", "$branch: ea4-tool-post-update change $tarball_path to be the git repo w/ submodules updated" );
+    ea4_tool::util::pushup( $git, $branch );
+
+    print "Done!\n";
+    return 1;
+}
+
+###############
+#### helpers ##
+###############
+
+sub _sys {
+    my ($cmd) = @_;
+    system($cmd);
+    die "`$cmd` exited uncleanly\n" if $? != 0;
+    return 1;
+}
+
+sub _get_update_info {
+    my $json = `./find-latest-version`;
+    die "./find_latest_version exited uncleanly\n" if $? != 0;
+
+    my $latest = Cpanel::JSON::Load($json);
+
+    my $tarpth = "SOURCES/$latest->{tarball}{name}";
+
+    my $gittag = $latest->{tarball}{url};
+    $gittag =~ s{.*/([^/]+)\.tar\.gz$}{$1};
+
+    my $tardir = `tar tzf $tarpth |head -n 1`;
+    die "`tar tzf $tarpth |head -n 1` exited uncleanly\n" if $?;
+    chomp $tardir;
+
+    return ( $gittag, $tarpth, $tardir );
+}
+
+1;
