@@ -1,10 +1,8 @@
-%global debug_package %{nil}
-
 Summary: Phusion Passenger application server Source Code
 Name: ea-ngx-brotli-src
 
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4590 for more details
-%define release_prefix 1
+%define release_prefix 2
 
 Version: 1.0.0
 Release: %{release_prefix}%{?dist}.cpanel
@@ -46,5 +44,8 @@ fi
 /opt/cpanel/ea-ngx-brotli-src/
 
 %changelog
+* Mon May 08 2023 Julian Brown <julian.brown@cpanel.net> - 1.0.0-2
+- ZC-10936: Clean up Makefile and remove debug-package-nil
+
 * Thu Feb 24 2022 Daniel Muey <dan@cpanel.net> - 1.0.0-1
 - ZC-9697: Initial version
