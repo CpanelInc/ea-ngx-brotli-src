@@ -27,7 +27,7 @@ sub _get_required {
     }
 
     # get $version, $url, $name from $res
-    my $version = Cpanel::JSON::Load( $res->{content} )->[0]{tag_name};
+    my $version = ea4_tool::util::json2ref( $res->{content} )->[0]{tag_name};
     $version =~ s/v//;
 
     my $suffix = "";
@@ -36,7 +36,7 @@ sub _get_required {
     }
     die "Could not determine version from github\n" if !$version;
 
-    my $name = "$version.tar.gz";                                                       # needs to match $version
+    my $name = "$version.tar.gz";                                                        # needs to match $version
     my $url  = "https://github.com/google/ngx_brotli/archive/v$version$suffix.tar.gz";
 
     return ( $version, $url, $name );
